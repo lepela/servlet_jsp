@@ -22,11 +22,15 @@ public class Post {
 	private final int cno;
 	private final boolean attachFlag;
 	
+	private Long rootno;
+	private int pdepth;
+	private int porder;
+	
 	@Builder.Default
 	private List<Attach> attachs = new ArrayList<>();
 
 	public Post(Long pno, String title, String writer, String content, Long viewCount, Date regdate, Date updatedate,
-			int cno, boolean attachFlag) {
+			int cno, boolean attachFlag, Long rootno, int pdepth, int porder) {
 		super();
 		this.pno = pno;
 		this.title = title;
@@ -37,6 +41,10 @@ public class Post {
 		this.updatedate = updatedate;
 		this.cno = cno;
 		this.attachFlag = attachFlag;
+		this.rootno = rootno;
+		this.pdepth = pdepth;
+		this.porder = porder;
+		
 	}
 	
 	

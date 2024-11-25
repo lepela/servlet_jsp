@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,11 +14,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.codehaus.jackson.map.ObjectMapper;
 
+import com.google.gson.Gson;
+
+import utils.Commons;
 import vo.Attach;
 
 
@@ -29,7 +29,7 @@ public class Upload extends HttpServlet{
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		factory.setSizeThreshold(1024*1024);
-		factory.setRepository(new File("c:/upload/tmp"));
+		factory.setRepository(new File(Commons.UPLOAD_PATH + File.separator + "tmp"));
 		
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		List<Attach> attachs = new ArrayList<>();
@@ -48,7 +48,7 @@ public class Upload extends HttpServlet{
 				String uuid = UUID.randomUUID().toString();
 				String realName = uuid + ext;
 				String path = getTodayStr();
-				File parentPath = new File("c:/upload", path);
+				File parentPath = new File(Commons.UPLOAD_PATH, path);
 				if(!parentPath.exists()) {
 					parentPath.mkdirs();
 				}
@@ -58,7 +58,8 @@ public class Upload extends HttpServlet{
 			System.out.println(attachs);
 			
 			resp.setContentType("application/json; charset=utf-8");
-			resp.getWriter().print(new ObjectMapper().writeValueAsString(attachs));
+			resp.getWriter().print(new Gson().toJson(attachs));
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

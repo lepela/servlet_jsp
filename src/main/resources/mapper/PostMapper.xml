@@ -13,13 +13,16 @@
 		<result column="view_count" property="viewCount" />
 		<result column="cno" property="cno" />
 		<result column="attach_flag" property="attachFlag" />
+		<result column="rootno" property="rootno" />
+		<result column="pdepth" property="pdepth" />
+		<result column="porder" property="porder" />
 	</resultMap>
 
 	<insert id="insert">
-	insert into tbl_post (title, writer, content, cno) values (#{title},#{writer},#{content},#{cno})
-	<selectKey order="AFTER" keyProperty="pno" resultType="long">
-	select max(pno) from tbl_post
-	</selectKey>
+		insert into tbl_post (title, writer, content, cno) values (#{title},#{writer},#{content},#{cno})
+		<selectKey order="AFTER" keyProperty="pno" resultType="long" >
+		select max(pno) from tbl_post
+		</selectKey>
 	</insert>
 	
 	<select id="selectOne" resultMap="post">
@@ -32,7 +35,26 @@
 
 	<select id="selectList" resultMap="post">
 	select tp.*, (select count(*) from tbl_attach ta where ta.pno = tp.pno) attach_flag
-	from tbl_post tp where cno = #{category} order by 1 desc limit #{amount} offset #{offset}
+	from tbl_post tp 
+	where cno = #{category}
+	<if test="type != null">
+		<trim prefix="and (" suffix=")" prefixOverrides="or"> 
+			<foreach collection="typeArr" item="t">
+				<if test='t == "T"'>
+					or title like concat('%', #{keyword}, '%')  
+				</if>
+				<if test='t == "C"'>
+					or content like concat('%', #{keyword}, '%')  
+				</if>
+				<if test='t == "W"'>
+					or writer like concat('%', #{keyword}, '%')  
+				</if>
+			</foreach>
+		</trim>
+	</if>
+	 
+	order by rootno desc, porder 
+	limit #{amount} offset #{offset}
 	</select>	
 	
 	<update id="update">
